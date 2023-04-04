@@ -1,8 +1,8 @@
 import puppeteer, { Browser, ElementHandle, Page } from "puppeteer";
 
-async function getProperty(element: ElementHandle, property: string) {
+async function getProperty(element: ElementHandle, property: string): Promise<string> {
     const propertyHandle = await element.getProperty(property);
-    return await propertyHandle.jsonValue();
+    return await propertyHandle.jsonValue() as string;
 }
 
 async function getHandle(
@@ -12,7 +12,16 @@ async function getHandle(
     return (await page.$(selector)) as ElementHandle<Element>;
 }
 
-async function getEventDetails(container: ElementHandle<Element>) {
+// An interface for the return object of getEventDetails
+
+interface EventDetails {
+    title: string;
+    description: string;
+    link: string;
+    image: string;
+}
+
+async function getEventDetails(container: ElementHandle<Element>): Promise<EventDetails> {
     // conainers --------------------------------------------------
     const titleContainer = await getHandle(container, "h4");
     const descriptionContainer = await getHandle(container, "p");
@@ -31,7 +40,7 @@ async function getEventDetails(container: ElementHandle<Element>) {
     return { title, description, link, image };
 }
 
-async function main() {
+async function main(): Promise<void> {
     const browser: Browser = await puppeteer.launch();
     const page: Page = await browser.newPage();
     await page.goto("https://gdsc.community.dev/monash-university/");
